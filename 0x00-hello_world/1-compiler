@@ -1,2 +1,2 @@
 #!/bin/bash
-gcc -c "$CFILE"
+chmod u+x 1-compiler gcc -c "$CFILE"
