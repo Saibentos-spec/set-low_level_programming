@@ -1,17 +1,16 @@
 #include "main.h"
 
 /**
- * print_alphabet - prints alphabet
+ * _islower - checks for lowercase character
+ * @c: character to check
+ *
+ * Return: 1 if lowercase, 0 otherwise
  */
 
-void print_alphabet(void)
+int _islower(int c)
 {
-	char c;
+	if (c >= 'a' && c <= 'z')
+		return (1);
 
-	for (c = 'a'; c <= 'z'; c++)
-	{
-		_putchar(c);
-	}
-
-	_putchar('\n');
+	return (0);
 }
