@@ -1,21 +1,19 @@
 #include "main.h"
 
 /**
- * main - prints _putchar
- *
- * Return: Always 0
+ * print_alphabet_x10 - prints alphabet 10 times
  */
 
-int main(void)
+void print_alphabet_x10(void)
 {
-	char str[] = "_putchar\n";
-	int i = 0;
+	int i;
+	char c;
 
-	while (str[i])
+	for (i = 0; i < 10; i++)
 	{
-		_putchar(str[i]);
-		i++;
-	}
+		for (c = 'a'; c <= 'z'; c++)
+			_putchar(c);
 
-	return (0);
+		_putchar('\n');
+	}
 }
