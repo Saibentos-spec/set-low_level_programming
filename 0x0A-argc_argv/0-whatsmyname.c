@@ -1,0 +1,23 @@
+#include <unistd.h>
+
+/**
+ * main - prints program name
+ * @argc: argument count
+ * @argv: argument vector
+ * Return: 0
+ */
+int main(int argc, char *argv[])
+{
+	int i = 0;
+
+	(void)argc;
+
+	while (argv[0][i])
+	{
+		write(1, &argv[0][i], 1);
+		i++;
+	}
+	write(1, "\n", 1);
+
+	return (0);
+}
