@@ -1,65 +1,37 @@
 #include "lists.h"
+#include <stdlib.h>
 #include <stdio.h>
 
 /**
- * print_listint_safe - prints a listint_t linked list safely (handles loops)
- * @head: pointer to the head of the list
+ * print_listint_safe - prints a listint_t list safely (handles loops)
+ * @head: pointer to list
  *
- * Return: number of nodes in the list
+ * Return: number of nodes printed
  */
 size_t print_listint_safe(const listint_t *head)
 {
-	const listint_t *slow = head;
-	const listint_t *fast = head;
-	const listint_t *loop_start = NULL;
+	const listint_t *nodes[1024];
+	size_t i, j = 0;
 	size_t count = 0;
 
-	if (head == NULL)
-		return (0);
-
-	/* Special case: single node loop */
-	if (head->next == head)
+	while (head != NULL)
 	{
-		printf("[%p] %d\n", (void *)head, head->n);
-		printf("-> [%p] %d\n", (void *)head, head->n);
-		return (1);
-	}
-
-	/* Floyd’s Cycle Detection */
-	while (fast && fast->next)
-	{
-		slow = slow->next;
-		fast = fast->next->next;
-
-		if (slow == fast)
+		/* check if node already visited */
+		for (i = 0; i < j; i++)
 		{
-			/* Find exact start of the loop */
-			slow = head;
-			while (slow != fast)
+			if (nodes[i] == head)
 			{
-				slow = slow->next;
-				fast = fast->next;
+				printf("-> [%p] %d\n", (void *)head, head->n);
+				return (count);
 			}
-			loop_start = slow;
-			break;
 		}
-	}
 
-	/* Print nodes */
-	slow = head;
-	while (slow)
-	{
-		printf("[%p] %d\n", (void *)slow, slow->n);
+		nodes[j++] = head;
+
+		printf("[%p] %d\n", (void *)head, head->n);
 		count++;
 
-		/* Stop before printing the loop node a second time */
-		if (loop_start && slow->next == loop_start)
-		{
-			printf("-> [%p] %d\n", (void *)slow->next, slow->next->n);
-			break;
-		}
-
-		slow = slow->next;
+		head = head->next;
 	}
 
 	return (count);
