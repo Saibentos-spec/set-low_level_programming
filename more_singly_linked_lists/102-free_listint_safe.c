@@ -10,41 +10,42 @@
 size_t free_listint_safe(listint_t **h)
 {
 	size_t count = 0;
-	size_t i;
-	listint_t *tmp;
-	listint_t **array = NULL;
+	listint_t *slow, *fast, *tmp;
 
 	if (h == NULL || *h == NULL)
 		return (0);
 
-	while (*h != NULL)
+	slow = *h;
+	fast = *h;
+
+	/* Detect loop using Floyd cycle detection */
+	while (fast != NULL && fast->next != NULL)
 	{
-		tmp = *h;
+		slow = slow->next;
+		fast = fast->next->next;
 
-		/* check if node was already visited */
-		for (i = 0; i < count; i++)
-		{
-			if (array[i] == tmp)
-			{
-				*h = NULL;
-				free(array);
-				return (count);
-			}
-		}
-
-		array = realloc(array, sizeof(listint_t *) * (count + 1));
-		if (array == NULL)
-			return (count);
-
-		array[count] = tmp;
-		count++;
-
-		*h = (*h)->next;
-		free(tmp);
+		if (slow == fast)
+			break;
 	}
 
-	free(array);
-	*h = NULL;
+	/* Free normally until loop or NULL */
+	slow = *h;
 
+	while (slow != NULL)
+	{
+		tmp = slow;
+		slow = slow->next;
+		free(tmp);
+		count++;
+
+		/* If next node is already visited in loop case */
+		if (slow == fast)
+		{
+			fast = NULL;
+			break;
+		}
+	}
+
+	*h = NULL;
 	return (count);
 }
