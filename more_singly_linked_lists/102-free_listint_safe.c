@@ -1,25 +1,25 @@
 #include "lists.h"
+#include <stdlib.h>
 
 /**
- * free_listint_safe - frees a listint_t list, handling loops
- * @h: pointer to pointer to the head of the list
+ * free_listint_safe - frees a listint_t list safely (handles loops)
+ * @h: pointer to pointer to head
  *
  * Return: size of the list that was freed
  */
 size_t free_listint_safe(listint_t **h)
 {
-	listint_t *slow;
-	listint_t *fast;
-	size_t count;
-	listint_t *tmp;
+	size_t count = 0;
+	listint_t *current, *next;
+	listint_t *slow, *fast;
 
 	if (h == NULL || *h == NULL)
 		return (0);
 
 	slow = *h;
 	fast = *h;
-	count = 0;
 
+	/* Detect loop */
 	while (fast != NULL && fast->next != NULL)
 	{
 		slow = slow->next;
@@ -28,56 +28,48 @@ size_t free_listint_safe(listint_t **h)
 			break;
 	}
 
-	if (fast == NULL || fast->next == NULL)
+	current = *h;
+	if (slow == fast && fast != NULL) /* Loop detected */
 	{
-		while (*h != NULL)
+		/* Find loop start */
+		slow = *h;
+		while (slow != fast)
 		{
-			tmp = (*h)->next;
-			free(*h);
-			*h = tmp;
+			slow = slow->next;
+			fast = fast->next;
+		}
+
+		/* Free up to loop */
+		while (current != slow)
+		{
+			next = current->next;
+			free(current);
+			current = next;
 			count++;
 		}
-		return (count);
-	}
 
-	/* Loop exists - find loop start and count unique nodes */
-	slow = *h;
-	while (slow != fast)
-	{
-		slow = slow->next;
-		fast = fast->next;
-	}
-
-	/* Break the loop */
-	fast = slow->next;
-	while (fast != slow)
-	{
-		fast = fast->next;
-	}
-	/* fast now points to node just before loop start — find it */
-	fast = *h;
-	if (fast != slow)
-	{
-		while (fast->next != slow)
-			fast = fast->next;
-		fast->next = NULL;
+		/* Free the loop nodes once */
+		next = current->next;
+		free(current);
+		count++;
+		while (next != current)
+		{
+			listint_t *temp = next;
+			next = next->next;
+			free(temp);
+			count++;
+		}
 	}
 	else
 	{
-		/* loop starts at head, find last node */
-		fast = slow->next;
-		while (fast->next != slow)
-			fast = fast->next;
-		fast->next = NULL;
-	}
-
-	/* Now free normally */
-	while (*h != NULL)
-	{
-		tmp = (*h)->next;
-		free(*h);
-		*h = tmp;
-		count++;
+		/* No loop, free normally */
+		while (current != NULL)
+		{
+			next = current->next;
+			free(current);
+			current = next;
+			count++;
+		}
 	}
 
 	*h = NULL;
