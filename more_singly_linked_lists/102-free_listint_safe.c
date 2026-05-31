@@ -3,75 +3,49 @@
 
 /**
  * free_listint_safe - frees a listint_t list safely (handles loops)
- * @h: pointer to pointer to head
+ * @h: pointer to head pointer
  *
- * Return: size of the list that was freed
+ * Return: number of nodes freed
  */
 size_t free_listint_safe(listint_t **h)
 {
 	size_t count = 0;
-	listint_t *current, *next;
-	listint_t *slow, *fast;
+	listint_t *tmp;
+	listint_t **array = NULL;
+	size_t i, j;
 
 	if (h == NULL || *h == NULL)
 		return (0);
 
-	slow = *h;
-	fast = *h;
-
-	/* Detect loop */
-	while (fast != NULL && fast->next != NULL)
+	while (*h != NULL)
 	{
-		slow = slow->next;
-		fast = fast->next->next;
-		if (slow == fast)
-			break;
-	}
+		tmp = *h;
 
-	current = *h;
-	if (slow == fast && fast != NULL) /* Loop detected */
-	{
-		/* Find loop start */
-		slow = *h;
-		while (slow != fast)
+		/* check if already seen (loop detection) */
+		for (i = 0; i < count; i++)
 		{
-			slow = slow->next;
-			fast = fast->next;
+			if (array[i] == tmp)
+			{
+				*h = NULL;
+				free(array);
+				return (count);
+			}
 		}
 
-		/* Free up to loop */
-		while (current != slow)
-		{
-			next = current->next;
-			free(current);
-			current = next;
-			count++;
-		}
+		/* store visited node */
+		array = realloc(array, sizeof(listint_t *) * (count + 1));
+		if (array == NULL)
+			return (count);
 
-		/* Free the loop nodes once */
-		next = current->next;
-		free(current);
+		array[count] = tmp;
 		count++;
-		while (next != current)
-		{
-			listint_t *temp = next;
-			next = next->next;
-			free(temp);
-			count++;
-		}
-	}
-	else
-	{
-		/* No loop, free normally */
-		while (current != NULL)
-		{
-			next = current->next;
-			free(current);
-			current = next;
-			count++;
-		}
+
+		*h = (*h)->next;
+		free(tmp);
 	}
 
+	free(array);
 	*h = NULL;
+
 	return (count);
 }
