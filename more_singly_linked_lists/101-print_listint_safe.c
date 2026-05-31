@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 /**
- * print_listint_safe - prints a listint_t linked list (safe version with loops)
+ * print_listint_safe - prints a listint_t linked list safely (handles loops)
  * @head: pointer to the head of the list
  *
  * Return: number of nodes in the list
@@ -17,7 +17,7 @@ size_t print_listint_safe(const listint_t *head)
 	if (head == NULL)
 		return (0);
 
-	/* Special case: single node pointing to itself */
+	/* Special case: single node loop */
 	if (head->next == head)
 	{
 		printf("[%p] %d\n", (void *)head, head->n);
@@ -25,7 +25,7 @@ size_t print_listint_safe(const listint_t *head)
 		return (1);
 	}
 
-	/* Floyd’s cycle detection */
+	/* Floyd’s Cycle Detection */
 	while (fast && fast->next)
 	{
 		slow = slow->next;
@@ -33,7 +33,7 @@ size_t print_listint_safe(const listint_t *head)
 
 		if (slow == fast)
 		{
-			/* Find start of loop */
+			/* Find exact start of the loop */
 			slow = head;
 			while (slow != fast)
 			{
@@ -45,14 +45,15 @@ size_t print_listint_safe(const listint_t *head)
 		}
 	}
 
-	/* Print the list */
+	/* Print nodes */
 	slow = head;
 	while (slow)
 	{
 		printf("[%p] %d\n", (void *)slow, slow->n);
 		count++;
 
-		if (loop_start && slow->next == loop_start && count > 1)
+		/* Stop before printing the loop node a second time */
+		if (loop_start && slow->next == loop_start)
 		{
 			printf("-> [%p] %d\n", (void *)slow->next, slow->next->n);
 			break;
