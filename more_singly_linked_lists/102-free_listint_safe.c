@@ -10,9 +10,9 @@
 size_t free_listint_safe(listint_t **h)
 {
 	size_t count = 0;
+	size_t i;
 	listint_t *tmp;
 	listint_t **array = NULL;
-	size_t i, j;
 
 	if (h == NULL || *h == NULL)
 		return (0);
@@ -21,7 +21,7 @@ size_t free_listint_safe(listint_t **h)
 	{
 		tmp = *h;
 
-		/* check if already seen (loop detection) */
+		/* check if node was already visited */
 		for (i = 0; i < count; i++)
 		{
 			if (array[i] == tmp)
@@ -32,7 +32,6 @@ size_t free_listint_safe(listint_t **h)
 			}
 		}
 
-		/* store visited node */
 		array = realloc(array, sizeof(listint_t *) * (count + 1));
 		if (array == NULL)
 			return (count);
