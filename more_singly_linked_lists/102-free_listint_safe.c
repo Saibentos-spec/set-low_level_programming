@@ -1,50 +1,77 @@
 #include "lists.h"
 #include <stdlib.h>
-#include <stdio.h>
+
 /**
  * free_listint_safe - frees a listint_t list safely (handles loops)
- * @h: pointer to pointer to the head of the list
+ * @h: pointer to pointer to head
  *
- * Return: the size of the list that was freed
+ * Return: size of the list that was freed
  */
 size_t free_listint_safe(listint_t **h)
 {
-	listint_t *slow = *h;
-	listint_t *fast = *h;
-	listint_t *temp;
 	size_t count = 0;
+	listint_t *current, *next;
+	listint_t *slow, *fast;
 
 	if (h == NULL || *h == NULL)
 		return (0);
 
-	/* Detect if there is a loop */
-	while (fast && fast->next)
+	slow = *h;
+	fast = *h;
+
+	/* Detect loop */
+	while (fast != NULL && fast->next != NULL)
 	{
 		slow = slow->next;
 		fast = fast->next->next;
-
 		if (slow == fast)
 			break;
 	}
 
-	slow = *h;
-	while (slow)
+	current = *h;
+	if (slow == fast && fast != NULL) /* Loop detected */
 	{
-		count++;
-		temp = slow;
-		slow = slow->next;
-
-		/* If we detect the loop again, stop after freeing current node */
-		if (fast && temp == fast)
+		/* Find loop start */
+		slow = *h;
+		while (slow != fast)
 		{
-			free(temp);
-			break;
+			slow = slow->next;
+			fast = fast->next;
 		}
 
-		free(temp);
+		/* Free up to loop */
+		while (current != slow)
+		{
+			next = current->next;
+			free(current);
+			current = next;
+			count++;
+		}
+
+		/* Free the loop nodes once */
+		next = current->next;
+		free(current);
+		count++;
+		while (next != current)
+		{
+			listint_t *temp = next;
+			next = next->next;
+			free(temp);
+			count++;
+		}
+	}
+	else
+	{
+		/* No loop, free normally */
+		while (current != NULL)
+		{
+			next = current->next;
+			free(current);
+			current = next;
+			count++;
+		}
 	}
 
 	*h = NULL;
-
 	return (count);
 }
